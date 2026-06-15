@@ -6,6 +6,9 @@
 export const SITE = {
   name: 'Nakshatra',                 // short wordmark — nav brand, footer, page titles
   fullName: 'Nakshatra Bansal',      // full name — hero headline only
+  // Absolute base URL — used to build absolute og:image / canonical URLs.
+  // TODO: update to https://nakshatrabansal.com once the domain is attached.
+  url: 'https://nakshatra-site.vercel.app',
   // TODO: this thesis line is the first thing visitors read. Make it yours.
   tagline:
     'Physics PhD working where neuromorphic hardware, spintronics, and the physics of learning meet.',
