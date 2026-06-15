@@ -5,3 +5,6 @@ dist
 
 # raw source for the portrait (cropped version lives in src/assets)
 linkedin_img.jpeg
+
+# local, machine-specific Claude Code permissions — keep private
+.claude/settings.local.json
