@@ -24,12 +24,16 @@ between sessions.
 ### Identity / config (in `src/consts.ts`)
 - `name`: `'Nakshatra'` — short wordmark (nav brand, footer, SEO titles).
 - `fullName`: `'Nakshatra Bansal'` — used **only** on the home hero headline.
+- `url`: `https://nakshatra-site.vercel.app` — base for absolute og:image /
+  canonical URLs. **TODO:** change to `https://nakshatrabansal.com` once attached.
 - `email`: `nakshatra.bansal@gmail.com`.
 - `location`: `'Irvine, CA'`.
 - `tagline`: **still the placeholder** (has a `TODO`) — owner to make it theirs.
 - `SOCIALS`: GitHub `https://github.com/Nakshatra120`, LinkedIn
   `https://www.linkedin.com/in/nakshatrabansal/`, Email. **Google Scholar was
   removed** (no official publications yet — re-add when there are).
+- **Social meta:** Open Graph + Twitter cards are live in `BaseLayout.astro`;
+  share banner is `public/og-image.png` (see item 7 below).
 
 ---
 
@@ -97,6 +101,32 @@ between sessions.
    **minimalist** → just `Initial commit` (no body, no co-author trailer, since
    descriptive details can change). Installed `gh`, owner authenticated, then
    `gh repo create nakshatra-site --public --source=. --remote=origin --push`.
+   **Commit-message preference going forward: minimalist, 3–7 words, no
+   co-author trailer, no long body.**
+7. **Social previews (Open Graph + Twitter cards).** Added the full meta set to
+   `BaseLayout.astro` (`og:title/description/type/url/site_name/image` +
+   `image:width/height/alt`, `twitter:card=summary_large_image` +
+   `twitter:title/description/image`, and a `<link rel="canonical">`), all with
+   **absolute** URLs built from the new `SITE.url`. Built the 1200×630 share
+   banner `public/og-image.png` via `scripts/generate-og.mjs` (kept in repo,
+   re-runnable) — on-brand: paper bg, mono accent eyebrow, serif name, the
+   damped-oscillation signature hairline, muted serif tagline, and the five
+   accent-preset dots. Banner uses system serif (Georgia) since custom webfonts
+   aren't easily available to the SVG rasterizer.
+8. **External links now open in a new tab.** New helper `src/utils.ts`
+   `newTabIfExternal(href)` returns `target="_blank" rel="noopener noreferrer"`
+   for `http(s)` links only. Applied in Footer (kept the `rel="me"` →
+   `rel="me noopener noreferrer"`), `about.astro`, `ProseLayout.astro` (project
+   code/paper/demo links), and `research.astro` (paper/code links). `mailto:` and
+   internal `/…` links deliberately stay same-tab. Owner had asked about just
+   GitHub/LinkedIn — flagged + covered the project/research links too.
+9. **Made `.claude/settings.local.json` private.** It's a machine-local tool
+   permission allowlist that was being tracked. `git rm --cached` + added to
+   `.gitignore` (kept on disk). ⚠️ Old copies still exist in the **public** git
+   history; owner was OK leaving them since the file holds **no secrets** (just
+   command-pattern approvals). If ever wanted gone: rewrite history with
+   `git filter-repo` + force-push, **or** make the repo private
+   (`gh repo edit --visibility private` — Vercel still deploys from private).
 
 ### Design language (quick reminder — full version in `CLAUDE.md`)
 - **Type pairing carries identity:** Newsreader serif = prose (the *writer*);
@@ -126,6 +156,11 @@ between sessions.
   `sudo`/password must be done by the owner in a normal terminal.
 - **Dev-server port drifted 4321 → 4322** when a stopped server still held the
   port; a clean restart returned it to 4321. Cosmetic.
+- **`sharp`/librsvg SVG gotcha (OG banner):** a `font-family` value containing
+  double quotes (`Georgia, "Times New Roman", serif`) broke the SVG XML parse
+  ("Opening and ending tag mismatch"). **Fix:** use single quotes inside the
+  attribute (`Georgia, 'Times New Roman', serif`). Relevant if editing
+  `scripts/generate-og.mjs`.
 
 ### What went right
 - esbuild override fixed the audit cleanly with zero breakage.
@@ -138,9 +173,22 @@ between sessions.
 ## 5. Open TODOs / next steps
 
 **Deploy finishing touches**
-- [ ] Confirm the live Vercel URL and record it in this file.
-- [ ] (Later) Buy `nakshatrabansal.com`, attach in Vercel → Domains, and set
-      `site` in `astro.config.mjs`.
+- [ ] Confirm the live Vercel URL and record it in this file. (Vercel import was
+      the owner's browser step — verify it completed.)
+- [ ] **Validate social preview once live:** open `…/og-image.png` in a browser,
+      then run the home URL through **LinkedIn Post Inspector** (also refreshes
+      LinkedIn's cache) and **opengraph.xyz / X Card Validator**. Platforms cache
+      hard, so do this *before* the first public share.
+- [ ] (Later) Buy `nakshatrabansal.com`, attach in Vercel → Domains, set `site`
+      in `astro.config.mjs`, **and** update `SITE.url` in `consts.ts` (then
+      re-run `node scripts/generate-og.mjs` is not needed — image URL is built
+      from `SITE.url` at build time).
+
+**Decisions left open (owner's call)**
+- [ ] Home `og:title` currently renders as just **"Nakshatra"** (derived from the
+      `name` wordmark). The banner *image* shows the full name; if the card's
+      text headline should also read "Nakshatra Bansal", make the home `og:title`
+      use `fullName`. Decide before validating so the cache is set once.
 
 **Content (owner's real input needed — see README checklist + `TODO`s in code)**
 - [ ] `src/consts.ts` — write the real `tagline` (still placeholder).
@@ -168,6 +216,7 @@ npm run dev               # dev server → http://localhost:4321
 npm run dev -- --host     # also expose on LAN (share to phone on same Wi-Fi)
 npm run build             # static build → ./dist  (sanity check before push)
 npm run preview           # preview the built site
+node scripts/generate-og.mjs   # regenerate public/og-image.png (after name/tagline change)
 
 # Deploy loop (auto-deploys on Vercel):
 git add -A && git commit -m "msg" && git push   # → Vercel redeploys main
@@ -184,5 +233,6 @@ git add -A && git commit -m "msg" && git push   # → Vercel redeploys main
 | Date       | Focus                                                            |
 |------------|------------------------------------------------------------------|
 | 2026-06-15 | Initial setup: deps, security override, identity in `consts.ts`, B&W→color hero portrait, first commit + push to GitHub, Vercel deploy started. |
+| 2026-06-15 (cont.) | Open Graph + Twitter cards & `og-image.png` banner generator; external links open in new tab (`utils.ts`); made `.claude/settings.local.json` private (untracked + gitignored). |
 
 <!-- Append new rows above as work continues. Keep newest at the bottom of the table or top of section 3-style notes — your call, just stay consistent. -->
