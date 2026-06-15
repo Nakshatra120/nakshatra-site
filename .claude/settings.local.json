@@ -9,7 +9,17 @@
       "Read(//tmp/**)",
       "Bash(sips -c 800 640 linkedin_img.jpeg --out src/assets/portrait.jpg)",
       "Bash(sips -g pixelWidth -g pixelHeight src/assets/portrait.jpg)",
-      "Bash(awk '{print $5, $9}')"
+      "Bash(awk '{print $5, $9}')",
+      "Bash(node -e \"const s=require\\('sharp'\\); console.log\\('sharp OK', s.versions ? JSON.stringify\\(s.versions\\) : ''\\)\")",
+      "Read(//System/Library/Fonts/Supplemental/**)",
+      "Read(//System/Library/Fonts/**)",
+      "Bash(node scripts/generate-og.mjs)",
+      "Bash(sips -g pixelWidth -g pixelHeight public/og-image.png)",
+      "Bash(awk '{print $5,$9}')",
+      "Bash(set -e)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
