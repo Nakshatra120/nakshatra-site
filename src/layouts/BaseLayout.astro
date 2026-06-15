@@ -1,0 +1,57 @@
+---
+import '@fontsource-variable/newsreader';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { SITE } from '../consts';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = SITE.tagline } = Astro.props;
+const fullTitle = title ? `${title} — ${SITE.name}` : SITE.name;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    {/* apply saved accent before paint to avoid a flash */}
+    <script is:inline>
+      document.documentElement.setAttribute(
+        'data-accent',
+        localStorage.getItem('accent') || 'blue'
+      );
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <style>
+      .skip {
+        position: absolute;
+        left: -999px;
+        top: 0;
+        background: var(--accent);
+        color: #fff;
+        padding: 0.6rem 1rem;
+        z-index: 50;
+      }
+      .skip:focus { left: 0.5rem; top: 0.5rem; border-radius: 4px; }
+      main { min-height: 60vh; }
+    </style>
+  </body>
+</html>

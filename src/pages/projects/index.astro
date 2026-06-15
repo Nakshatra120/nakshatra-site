@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntryRow from '../../components/EntryRow.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<BaseLayout title="Projects" description="Self-directed builds and experiments.">
+  <section class="wrap page-head">
+    <p class="eyebrow">Projects</p>
+    <h1 class="page-title">Things I built</h1>
+    <p class="page-intro">
+      Self-directed builds, reproductions, and weekend experiments — each with a
+      writeup of what I did and what broke.
+    </p>
+  </section>
+
+  <section class="wrap">
+    <div class="list">
+      {
+        projects.map((p) => (
+          <EntryRow
+            kind="project"
+            title={p.data.title}
+            summary={p.data.summary}
+            href={`/projects/${p.id}`}
+            date={p.data.date}
+            tags={p.data.tags}
+            status={p.data.status}
+          />
+        ))
+      }
+      {projects.length === 0 && <p class="empty mono">No projects published yet.</p>}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head { padding-block: clamp(2.5rem, 7vw, 4.5rem) 1.5rem; }
+  .page-title { font-size: clamp(2.4rem, 6vw, 3.6rem); letter-spacing: -0.02em; margin: 0.4rem 0 0.8rem; }
+  .page-intro { font-size: 1.2rem; color: var(--muted); max-width: 50ch; margin: 0; }
+  .list { border-top: 1px solid var(--line); }
+  .empty { padding-block: 2rem; color: var(--faint); }
+</style>

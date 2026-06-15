@@ -1,0 +1,7 @@
+node_modules
+dist
+.astro
+.DS_Store
+
+# raw source for the portrait (cropped version lives in src/assets)
+linkedin_img.jpeg

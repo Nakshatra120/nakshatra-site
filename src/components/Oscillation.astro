@@ -1,0 +1,44 @@
+---
+// Signature motif: a damped oscillation settling into a baseline, drawn as a
+// hairline in the accent color. Reads as a spin-oscillator ringdown / a spike
+// train — the subject's own vernacular. Draws once on load (reduced-motion safe).
+interface Props { height?: number; }
+const { height = 40 } = Astro.props;
+
+// Build a damped sinusoid path procedurally.
+const W = 600;
+const H = height;
+const mid = H / 2;
+const pts: string[] = [];
+for (let x = 0; x <= W; x += 4) {
+  const t = x / W;
+  const envelope = Math.exp(-3.2 * t);          // damping
+  const y = mid - Math.sin(t * 34) * (mid - 3) * envelope;
+  pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+}
+const d = `M ${pts.join(' L ')}`;
+---
+
+<svg class="osc" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
+  <line x1="0" y1={mid} x2={W} y2={mid} class="osc__base" />
+  <path d={d} class="osc__wave" />
+</svg>
+
+<style>
+  .osc { display: block; width: 100%; height: auto; overflow: visible; }
+  .osc__base { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .osc__wave {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: osc-draw 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s forwards;
+  }
+  @keyframes osc-draw { to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .osc__wave { stroke-dashoffset: 0; animation: none; }
+  }
+</style>

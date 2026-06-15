@@ -1,0 +1,79 @@
+---
+// A single row in a feed/list. Renders a kind badge, title, summary, and
+// monospace metadata (date + tags) — the "everything quantitative is data" idea.
+interface Props {
+  kind: 'project' | 'writing' | 'research';
+  title: string;
+  summary: string;
+  href?: string;
+  date?: Date;
+  meta?: string;        // freeform meta (e.g. venue) used by research
+  tags?: string[];
+  status?: string;
+}
+const { kind, title, summary, href, date, meta, tags = [], status } = Astro.props;
+
+const kindLabel = { project: 'Project', writing: 'Essay', research: 'Research' }[kind];
+const dateStr = date
+  ? date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
+  : meta;
+
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag class:list={['row', { 'row--link': !!href }]} href={href}>
+  <div class="row__top">
+    <span class="row__kind eyebrow">{kindLabel}</span>
+    {dateStr && <span class="mono row__date">{dateStr}</span>}
+    {status && <span class="mono row__status">{status}</span>}
+  </div>
+  <h3 class="row__title">{title}</h3>
+  <p class="row__summary">{summary}</p>
+  {
+    tags.length > 0 && (
+      <ul class="tags row__tags">
+        {tags.map((t) => (
+          <li class="tag">{t}</li>
+        ))}
+      </ul>
+    )
+  }
+</Tag>
+
+<style>
+  .row {
+    display: block;
+    padding-block: 1.6rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .row--link { cursor: pointer; }
+  .row__top {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+  .row__date { color: var(--faint); }
+  .row__status {
+    color: var(--accent-ink);
+    border: 1px solid var(--accent-weak);
+    background: var(--accent-weak);
+    border-radius: 999px;
+    padding: 0.05rem 0.5rem;
+    font-size: 0.66rem;
+  }
+  .row__title {
+    font-size: clamp(1.35rem, 2.6vw, 1.7rem);
+    margin-bottom: 0.35rem;
+    transition: color 0.15s ease;
+    max-width: var(--measure);
+  }
+  .row--link:hover .row__title { color: var(--accent-ink); }
+  .row__summary {
+    margin: 0 0 0.7rem;
+    color: var(--muted);
+    max-width: var(--measure);
+    line-height: 1.55;
+  }
+  .row__tags { margin-top: 0.2rem; }
+</style>

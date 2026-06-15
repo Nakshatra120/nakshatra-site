@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npm audit *)",
+      "Bash(curl -s http://localhost:4322/ -o /tmp/home.html -w \"HTTP %{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(sips -c 800 640 linkedin_img.jpeg --out src/assets/portrait.jpg)",
+      "Bash(sips -g pixelWidth -g pixelHeight src/assets/portrait.jpg)",
+      "Bash(awk '{print $5, $9}')"
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+---
+import { SOCIALS, SITE } from '../consts';
+import AccentToggle from './AccentToggle.astro';
+const year = new Date().getFullYear();
+const links = SOCIALS.filter((s) => s.href);
+---
+
+<footer class="site-foot">
+  <hr class="rule" />
+  <div class="wrap site-foot__inner">
+    <div class="site-foot__links">
+      {
+        links.map((s) => (
+          <a class="link" href={s.href} rel="me">
+            {s.label}
+          </a>
+        ))
+      }
+    </div>
+    <AccentToggle />
+  </div>
+  <div class="wrap site-foot__base">
+    <span class="mono">© {year} {SITE.name}</span>
+    <span class="mono">{SITE.location}</span>
+  </div>
+</footer>
+
+<style>
+  .site-foot { margin-top: clamp(4rem, 10vw, 7rem); }
+  .site-foot__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-top: 2rem;
+  }
+  .site-foot__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+  .site-foot__base {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.4rem 2.5rem;
+  }
+</style>

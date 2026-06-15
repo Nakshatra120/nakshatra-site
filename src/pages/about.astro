@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SOCIALS, SITE } from '../consts';
+const links = SOCIALS.filter((s) => s.href);
+---
+
+<BaseLayout title="About" description="About Nakshatra.">
+  <section class="wrap about">
+    <p class="eyebrow">About</p>
+    <h1 class="about__title">{SITE.name}</h1>
+
+    <div class="about__body">
+      {/* TODO: rewrite this in your own voice — it's the one page people read top to bottom. */}
+      <p>
+        I'm an incoming Physics PhD student at UC Irvine, starting in 2026, after
+        a BS in Physics at UC San Diego. My work sits at the intersection of
+        <strong>neuromorphic computing</strong>, <strong>spintronics and device
+        physics</strong>, and the <strong>theoretical physics of learning</strong>.
+      </p>
+      <p>
+        My background is unusually hardware-grounded for the field: I came to
+        neuromorphic computing through spin-torque oscillators and device
+        physics rather than software, which shapes how I think about what
+        learning systems can and can't do at the level of real materials.
+      </p>
+      <p>
+        Lately I've also been working on AI for science — large-scale molecular
+        dynamics simulations and machine learning for protein–DNA binding
+        affinity. The through-line across all of it is a single question I find
+        hard to put down: how an instrument made of matter comes to understand
+        the world it's part of.
+      </p>
+      <p>
+        I write here to think in the open, and I build things on weekends to
+        learn with my hands. This site is where both live.
+      </p>
+    </div>
+
+    <hr class="rule about__rule" />
+
+    <div class="about__contact">
+      <span class="mono about__contact-label">Contact</span>
+      <div class="about__links">
+        <a class="link" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        {links.map((s) => <a class="link" href={s.href}>{s.label}</a>)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about { padding-block: clamp(2.5rem, 7vw, 4.5rem) 0; max-width: 44rem; }
+  .about__title { font-size: clamp(2.6rem, 7vw, 4rem); letter-spacing: -0.025em; margin: 0.4rem 0 1.8rem; }
+  .about__body { font-size: 1.18rem; line-height: 1.7; }
+  .about__body p { margin: 0 0 1.3rem; }
+  .about__body strong { font-weight: 600; color: var(--accent-ink); }
+  .about__rule { margin-block: 2.5rem; }
+  .about__contact { display: flex; flex-direction: column; gap: 0.8rem; }
+  .about__links { display: flex; flex-wrap: wrap; gap: 1.4rem; font-family: var(--mono); font-size: 0.9rem; }
+</style>

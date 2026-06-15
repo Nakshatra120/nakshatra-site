@@ -1,0 +1,179 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Oscillation from '../components/Oscillation.astro';
+import EntryRow from '../components/EntryRow.astro';
+import portrait from '../assets/portrait.jpg';
+import { SITE } from '../consts';
+import { RESEARCH } from '../data/research';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const writing = (await getCollection('writing', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+// Selected-work feed: featured research + most recent project + most recent essay.
+type Feed = {
+  kind: 'project' | 'writing' | 'research';
+  title: string;
+  summary: string;
+  href?: string;
+  date?: Date;
+  meta?: string;
+  tags: string[];
+  status?: string;
+  sortDate: number;
+};
+
+const feed: Feed[] = [
+  ...RESEARCH.filter((r) => r.featured).map((r) => ({
+    kind: 'research' as const,
+    title: r.title,
+    summary: r.summary,
+    href: '/research',
+    meta: `${r.venue} · ${r.period}`,
+    tags: r.tags,
+    status: r.status,
+    sortDate: Number(r.period.match(/\d{4}/g)?.slice(-1)[0] ?? 0),
+  })),
+  ...projects.slice(0, 2).map((p) => ({
+    kind: 'project' as const,
+    title: p.data.title,
+    summary: p.data.summary,
+    href: `/projects/${p.id}`,
+    date: p.data.date,
+    tags: p.data.tags,
+    status: p.data.status,
+    sortDate: p.data.date.valueOf(),
+  })),
+  ...writing.slice(0, 2).map((w) => ({
+    kind: 'writing' as const,
+    title: w.data.title,
+    summary: w.data.summary,
+    href: `/writing/${w.id}`,
+    date: w.data.date,
+    tags: w.data.tags,
+    sortDate: w.data.date.valueOf(),
+  })),
+];
+---
+
+<BaseLayout>
+  <section class="hero wrap">
+    <div class="hero__text">
+      <p class="eyebrow hero__eyebrow">{SITE.location}</p>
+      <h1 class="hero__name">{SITE.fullName}</h1>
+      <div class="hero__osc"><Oscillation height={44} /></div>
+      <p class="hero__tagline">{SITE.tagline}</p>
+    </div>
+    <div class="hero__media">
+      {/* Duotone portrait — tinted by var(--accent), so it sweeps with the
+          footer swatches. Optimized + responsive via astro:assets. */}
+      <figure class="portrait">
+        <Image src={portrait} alt={SITE.fullName} widths={[256, 384, 640]}
+               sizes="(max-width: 640px) 30vw, 12rem" />
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap feed-section">
+    <div class="feed-head">
+      <h2 class="feed-head__title">Selected work</h2>
+      <span class="mono">a few things, recently</span>
+    </div>
+    <div class="feed">
+      {feed.map((item) => <EntryRow {...item} />)}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: clamp(1.5rem, 5vw, 3.5rem);
+    padding-block: clamp(3.5rem, 9vw, 6.5rem) 1rem;
+  }
+  .hero__text { min-width: 0; }
+  .hero__eyebrow { margin: 0 0 1rem; }
+
+  /* Portrait: black & white by default. A pointer-driven --reveal (0 at the
+     edges/corners, 1 dead-center) fades it toward full color as the cursor
+     nears the middle. --reveal is set by the inline script below. */
+  .hero__media { justify-self: end; }
+  .portrait {
+    --reveal: 0;
+    margin: 0;
+    width: clamp(8rem, 22vw, 12rem);
+    aspect-ratio: 4 / 5;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* reveal 0 -> grayscale(1) = B&W;  reveal 1 -> grayscale(0) = exact original */
+    filter: grayscale(calc(1 - var(--reveal)));
+    transition: filter 0.15s ease-out;
+  }
+
+  @media (max-width: 640px) {
+    .hero { grid-template-columns: 1fr; justify-items: start; }
+    .hero__media { order: -1; justify-self: start; }  /* photo above the name */
+    .portrait { width: clamp(6rem, 30vw, 8.5rem); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .portrait img { transition: none; }
+  }
+  .hero__name {
+    font-size: clamp(3.2rem, 12vw, 6.5rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+  }
+  .hero__osc { max-width: 30rem; margin: 1.4rem 0 2rem; }
+  .hero__tagline {
+    font-size: clamp(1.25rem, 3.2vw, 1.7rem);
+    line-height: 1.4;
+    color: var(--muted);
+    max-width: 34ch;
+    margin: 0;
+  }
+  .feed-section { padding-top: 2rem; }
+  .feed-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .feed-head__title { font-size: 1.05rem; font-weight: 600; letter-spacing: 0.01em; }
+</style>
+
+<script>
+  // Pointer-proximity color reveal for the hero portrait.
+  // reveal = 1 dead-center (full color) → 0 at the corners (black & white).
+  const fig = document.querySelector<HTMLElement>('.portrait');
+  if (fig) {
+    const CORNER = Math.hypot(0.5, 0.5); // center→corner distance in unit space (~0.707)
+    fig.addEventListener('pointermove', (e) => {
+      const r = fig.getBoundingClientRect();
+      const dx = (e.clientX - r.left) / r.width - 0.5;
+      const dy = (e.clientY - r.top) / r.height - 0.5;
+      const dist = Math.hypot(dx, dy);                  // 0 center .. ~0.707 corner
+      const reveal = Math.max(0, 1 - dist / CORNER);    // 1 center .. 0 corner
+      fig.style.setProperty('--reveal', reveal.toFixed(3));
+    });
+    fig.addEventListener('pointerleave', () => {
+      fig.style.setProperty('--reveal', '0');           // back to black & white
+    });
+  }
+</script>

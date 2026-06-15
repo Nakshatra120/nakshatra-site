@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EntryRow from '../../components/EntryRow.astro';
+import { getCollection } from 'astro:content';
+
+const writing = (await getCollection('writing', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<BaseLayout title="Writing" description="Essays and notes — thinking in my own voice.">
+  <section class="wrap page-head">
+    <p class="eyebrow">Writing</p>
+    <h1 class="page-title">Notes &amp; essays</h1>
+    <p class="page-intro">
+      Working out ideas in my own words — a dated log of how I think about
+      problems, kept partly so I can think better by writing them down.
+    </p>
+  </section>
+
+  <section class="wrap">
+    <div class="list">
+      {
+        writing.map((w) => (
+          <EntryRow
+            kind="writing"
+            title={w.data.title}
+            summary={w.data.summary}
+            href={`/writing/${w.id}`}
+            date={w.data.date}
+            tags={w.data.tags}
+          />
+        ))
+      }
+      {writing.length === 0 && <p class="empty mono">Nothing published yet.</p>}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head { padding-block: clamp(2.5rem, 7vw, 4.5rem) 1.5rem; }
+  .page-title { font-size: clamp(2.4rem, 6vw, 3.6rem); letter-spacing: -0.02em; margin: 0.4rem 0 0.8rem; }
+  .page-intro { font-size: 1.2rem; color: var(--muted); max-width: 52ch; margin: 0; }
+  .list { border-top: 1px solid var(--line); }
+  .empty { padding-block: 2rem; color: var(--faint); }
+</style>

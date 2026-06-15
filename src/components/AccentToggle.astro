@@ -1,0 +1,71 @@
+---
+// The signature element: the accent color is a tunable parameter.
+// Choice persists in localStorage and is applied before paint to avoid flash.
+const ACCENTS = ['blue', 'rust', 'violet', 'green', 'ink'] as const;
+---
+
+<div class="accent" role="group" aria-label="Accent color">
+  <span class="mono accent__label">accent</span>
+  <div class="accent__swatches">
+    {
+      ACCENTS.map((a) => (
+        <button
+          type="button"
+          class="accent__dot"
+          data-set-accent={a}
+          data-accent={a}
+          aria-label={`Set accent to ${a}`}
+        />
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .accent { display: inline-flex; align-items: center; gap: 0.6rem; }
+  .accent__label { line-height: 1; }
+  .accent__swatches { display: inline-flex; gap: 0.45rem; }
+  .accent__dot {
+    --c: var(--accent);
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    border-radius: 999px;
+    border: 1.5px solid color-mix(in srgb, var(--c) 40%, var(--line));
+    background: var(--c);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .accent__dot[data-accent='blue']   { --c: #2a45d4; }
+  .accent__dot[data-accent='rust']   { --c: #c5462f; }
+  .accent__dot[data-accent='violet'] { --c: #6c3fd1; }
+  .accent__dot[data-accent='green']  { --c: #1f8a5b; }
+  .accent__dot[data-accent='ink']    { --c: #16181d; }
+  .accent__dot:hover { transform: scale(1.18); }
+  .accent__dot[aria-pressed='true'] {
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--c);
+  }
+</style>
+
+<script>
+  const KEY = 'accent';
+  const root = document.documentElement;
+
+  function apply(value: string) {
+    root.setAttribute('data-accent', value);
+    document.querySelectorAll<HTMLButtonElement>('[data-set-accent]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(b.dataset.setAccent === value));
+    });
+  }
+
+  const saved = localStorage.getItem(KEY) || 'blue';
+  apply(saved);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-set-accent]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const v = btn.dataset.setAccent!;
+      localStorage.setItem(KEY, v);
+      apply(v);
+    });
+  });
+</script>
