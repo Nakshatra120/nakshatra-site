@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { RESEARCH } from '../data/research';
+import { newTabIfExternal } from '../utils';
 ---
 
 <BaseLayout title="Research" description="Formal research work.">
@@ -37,7 +38,7 @@ import { RESEARCH } from '../data/research';
             {r.links && r.links.length > 0 && (
               <div class="entry__links">
                 {r.links.map((l) => (
-                  <a class="link" href={l.href}>
+                  <a class="link" href={l.href} {...newTabIfExternal(l.href)}>
                     {l.label} ↗
                   </a>
                 ))}

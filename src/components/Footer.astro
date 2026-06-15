@@ -3,6 +3,7 @@ import { SOCIALS, SITE } from '../consts';
 import AccentToggle from './AccentToggle.astro';
 const year = new Date().getFullYear();
 const links = SOCIALS.filter((s) => s.href);
+const isExternal = (href: string) => /^https?:\/\//i.test(href);
 ---
 
 <footer class="site-foot">
@@ -11,7 +12,12 @@ const links = SOCIALS.filter((s) => s.href);
     <div class="site-foot__links">
       {
         links.map((s) => (
-          <a class="link" href={s.href} rel="me">
+          <a
+            class="link"
+            href={s.href}
+            rel={isExternal(s.href) ? 'me noopener noreferrer' : 'me'}
+            target={isExternal(s.href) ? '_blank' : undefined}
+          >
             {s.label}
           </a>
         ))

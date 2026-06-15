@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import { newTabIfExternal } from '../utils';
 
 interface Props {
   title: string;
@@ -46,7 +47,7 @@ const backHref = kind === 'project' ? '/projects' : '/writing';
         linkEntries.length > 0 && (
           <div class="prose-links">
             {linkEntries.map(([k, v]) => (
-              <a class="link" href={v as string}>
+              <a class="link" href={v as string} {...newTabIfExternal(v as string)}>
                 {k} ↗
               </a>
             ))}

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SOCIALS, SITE } from '../consts';
+import { newTabIfExternal } from '../utils';
 const links = SOCIALS.filter((s) => s.href);
 ---
 
@@ -42,7 +43,7 @@ const links = SOCIALS.filter((s) => s.href);
       <span class="mono about__contact-label">Contact</span>
       <div class="about__links">
         <a class="link" href={`mailto:${SITE.email}`}>{SITE.email}</a>
-        {links.map((s) => <a class="link" href={s.href}>{s.label}</a>)}
+        {links.map((s) => <a class="link" href={s.href} {...newTabIfExternal(s.href)}>{s.label}</a>)}
       </div>
     </div>
   </section>
